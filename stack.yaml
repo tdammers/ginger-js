@@ -29,6 +29,11 @@ setup-info:
 # will not be run. This is useful for tweaking upstream packages.
 packages:
 - '.'
+- location:
+    git: https://github.com/ghcjs/ghcjs-ffiqq
+    commit: 'b52338c2dcd3b0707bc8aff2e171411614d4aedb'
+  extra-dep: true
+
 # Dependency packages to be pulled from upstream that are not in the resolver
 # (e.g., acme-missiles-0.3)
 extra-deps:
