@@ -32,7 +32,7 @@ import GHCJS.Foreign.QQ
 import Data.Default (def)
 import Data.Scientific as Scientific
 import System.IO.Unsafe (unsafePerformIO)
-import Control.Monad (forM, forM_, forever)
+import Control.Monad (forM, forM_, forever, when)
 import Control.Monad.IO.Class
 import Control.Applicative
 import Control.Arrow
@@ -139,8 +139,7 @@ ginger templateJS contextJS = do
             (const $ return Nothing) -- include resolver
             Nothing -- source name
             (Text.unpack templateStr) -- template source
-    context <- maybe (warn "Context must be object") return $
-        jsvalToDictItems contextJS
+    let context = fromMaybe [] $ jsvalToDictItems contextJS
     buf <- newIORef ""
     easyRenderM
         (\str -> modifyIORef buf (<> str))
@@ -155,14 +154,14 @@ roundtrip jsval = do
         gval = toGVal jsval
     return $ jsvalFromGVal gval
 
-foreign import javascript unsafe "if (module.exports) { module.exports.ginger = $1 } else { ginger = $1 }"
-    js_exportGinger :: Callback (JSVal -> JSVal -> IO JSVal) -> IO ()
+foreign import javascript unsafe "registerGinger($1)"
+    js_exportGingerNode :: Callback (JSVal -> JSVal -> IO JSVal) -> IO ()
+
+foreign import javascript unsafe "ginger = $1"
+    js_exportGingerBrowser :: Callback (JSVal -> JSVal -> IO JSVal) -> IO ()
 
 foreign import javascript unsafe "console.log($1)"
     consoleLog :: JSString -> IO ()
-
-foreign import javascript unsafe "if (module.exports) { module.exports.roundtrip = $1 } else { roundtrip = $1 }"
-    js_exportRoundtrip :: Callback (JSVal -> IO JSVal) -> IO ()
 
 warn :: String -> IO a
 warn str = do
@@ -171,9 +170,18 @@ warn str = do
 
 main :: IO ()
 main = do
-    syncCallback2' ginger >>= js_exportGinger
-    syncCallback1' roundtrip >>= js_exportRoundtrip
-    -- The following is required to keep the Haskell thread alive; without this
-    -- kludge, node will exit immediately after require()ing the resulting
-    -- module.
-    forever $ threadDelay 1000000
+    -- We need to detect whether we're running in node.js or not, because
+    -- exporting and execution model differ between node and the browser.
+    -- So we check whether 'module.exports' or 'window' exist; if the former,
+    -- and not the latter, we're running node.
+    if [js'| typeof(module) === 'object' && typeof(module.exports) === 'object' && typeof(window) === 'undefined' |]
+        then do
+            -- The following is required to keep the Haskell thread alive;
+            -- without this kludge, node will exit immediately after
+            -- require()ing the resulting module. However, keeping the Haskell
+            -- thread blocked forever causes a runtime exception in the
+            -- browser, so we'll only do it for node.js
+            syncCallback2' ginger >>= js_exportGingerNode
+            forever $ threadDelay 1000000
+        else do
+            syncCallback2' ginger >>= js_exportGingerBrowser
