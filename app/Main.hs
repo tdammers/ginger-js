@@ -32,10 +32,11 @@ import GHCJS.Foreign.QQ
 import Data.Default (def)
 import Data.Scientific as Scientific
 import System.IO.Unsafe (unsafePerformIO)
-import Control.Monad (forM, forM_)
+import Control.Monad (forM, forM_, forever)
 import Control.Monad.IO.Class
 import Control.Applicative
 import Control.Arrow
+import Control.Concurrent (threadDelay)
 import Data.Maybe (fromMaybe)
 import Data.Monoid
 import Data.IORef
@@ -154,13 +155,13 @@ roundtrip jsval = do
         gval = toGVal jsval
     return $ jsvalFromGVal gval
 
-foreign import javascript unsafe "ginger = $1"
+foreign import javascript unsafe "if (module.exports) { module.exports.ginger = $1 } else { ginger = $1 }"
     js_exportGinger :: Callback (JSVal -> JSVal -> IO JSVal) -> IO ()
 
 foreign import javascript unsafe "console.log($1)"
     consoleLog :: JSString -> IO ()
 
-foreign import javascript unsafe "roundtrip = $1"
+foreign import javascript unsafe "if (module.exports) { module.exports.roundtrip = $1 } else { roundtrip = $1 }"
     js_exportRoundtrip :: Callback (JSVal -> IO JSVal) -> IO ()
 
 warn :: String -> IO a
@@ -172,3 +173,7 @@ main :: IO ()
 main = do
     syncCallback2' ginger >>= js_exportGinger
     syncCallback1' roundtrip >>= js_exportRoundtrip
+    -- The following is required to keep the Haskell thread alive; without this
+    -- kludge, node will exit immediately after require()ing the resulting
+    -- module.
+    forever $ threadDelay 1000000
