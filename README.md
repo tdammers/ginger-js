@@ -50,7 +50,7 @@ and it contains an `index.html` file that you can load into a browser to try
 out Ginger in the browser console.
 
 In order to turn this into a usable NodeJS module, run the
-`package-for-node.sh` script in the project root, which will create the file
+`make-module.sh` script in the project root, which will create the file
 `ginger-js.js`. This file is a proper CommonJS module, suitable for
 `require()`ing in NodeJS.
 
