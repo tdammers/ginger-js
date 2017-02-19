@@ -1,0 +1,20 @@
+{
+  "name": "purescript-ginger",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "output"
+  ],
+  "dependencies": {
+    "purescript-prelude": "^2.4.0",
+    "purescript-console": "^2.0.0",
+    "purescript-aff": "^2.0.3",
+    "purescript-argonaut-core": "^2.0.1",
+    "purescript-ffi-utils": "^1.2.0",
+    "purescript-argonaut": "^2.0.0"
+  },
+  "devDependencies": {
+    "purescript-psci-support": "^2.0.0"
+  }
+}

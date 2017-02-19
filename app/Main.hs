@@ -148,12 +148,6 @@ ginger templateJS contextJS = do
     rendered <- readIORef buf
     toJSVal (rendered :: Text)
 
-roundtrip :: JSVal -> IO JSVal
-roundtrip jsval = do
-    let gval :: GVal IO
-        gval = toGVal jsval
-    return $ jsvalFromGVal gval
-
 foreign import javascript unsafe "registerGinger($1)"
     js_exportGingerNode :: Callback (JSVal -> JSVal -> IO JSVal) -> IO ()
 
@@ -182,6 +176,5 @@ main = do
             -- thread blocked forever causes a runtime exception in the
             -- browser, so we'll only do it for node.js
             syncCallback2' ginger >>= js_exportGingerNode
-            forever $ threadDelay 1000000
         else do
             syncCallback2' ginger >>= js_exportGingerBrowser

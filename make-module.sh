@@ -4,7 +4,7 @@ PROJECT_NAME=ginger-js-export
 JS_DIR="$INSTALL_ROOT/bin/$PROJECT_NAME.jsexe"
 OUTPUT_DIR="npm-dist"
 MODULE_NAME=ginger-js
-OUTPUT_FILE="$OUTPUT_DIR/$MODULE_NAME.js"
+OUTPUT_FILE="$OUTPUT_DIR/$MODULE_NAME"
 
 mkdir -p "$OUTPUT_DIR"
 
@@ -23,25 +23,42 @@ mkdir -p "$OUTPUT_DIR"
     # wrapper switches its behavior from enqueueing to executing directly, and
     # also runs through the job queue. The callback setup allows us to do this
     # transparently and asynchronously.
-    echo '"use strict"'
-    echo 'var actualGinger = null'
-    echo 'var gingerQueue = []'
-    echo 'var ginger = function (template, context, cb) {'
-    echo '  if (actualGinger == null)'
-    echo '    gingerQueue.push({template: template, context: context, cb: cb})'
-    echo '  else'
-    echo '    cb(actualGinger(template, context))'
-    echo '}'
-    echo 'var registerGinger = function (g) {'
-    echo '  actualGinger = g'
-    echo '  var job = null'
-    echo '  while (job = gingerQueue.pop()) {'
-    echo '    job.cb(g(job.template, job.context))'
-    echo '  }'
-    echo '}'
-    echo 'module.exports.ginger = ginger'
-    echo ''
+    cat <<"EOT"
+'use strict'
+var actualGinger = null
+var gingerQueue = []
+var ginger = function (template, context, cb) {
+  if (actualGinger == null)
+    gingerQueue.push({template: template, context: context, cb: cb})
+  else
+    (function() {
+        try {
+            var result = actualGinger(template, context)
+            cb(null, result)
+        }
+        catch (e) {
+            cb(e, null)
+        }
+    })()
+}
+var registerGinger = function (g) {
+  actualGinger = g
+  var job = null
+  while (job = gingerQueue.pop()) {
+    (function() {
+        try {
+            var result = actualGinger(job.template, job.context)
+            job.cb(null, result)
+        }
+        catch (e) {
+            job.cb(e, null)
+        }
+    })()
+  }
+}
+module.exports.ginger = ginger
+EOT
     echo '/////////// BEGIN GHCJS GENERATED CODE ///////////'
     cat "$JS_DIR/all.js"
     echo '/////////// END GHCJS GENERATED CODE ///////////'
-) > "$OUTPUT_FILE"
+) > "$OUTPUT_FILE.js"
