@@ -2,9 +2,11 @@
 INSTALL_ROOT=$(stack path --local-install-root)
 PROJECT_NAME=ginger-js-export
 JS_DIR="$INSTALL_ROOT/bin/$PROJECT_NAME.jsexe"
+OUTPUT_DIR="npm-dist"
 MODULE_NAME=ginger-js
+OUTPUT_FILE="$OUTPUT_DIR/$MODULE_NAME.js"
 
-OUTPUT_FILE="$MODULE_NAME.js"
+mkdir -p "$OUTPUT_DIR"
 
 (
     # Some serious callback voodoo is needed to play nice with nodejs.
