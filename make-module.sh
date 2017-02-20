@@ -2,11 +2,13 @@
 INSTALL_ROOT=$(stack path --local-install-root)
 PROJECT_NAME=ginger-js-export
 JS_DIR="$INSTALL_ROOT/bin/$PROJECT_NAME.jsexe"
-OUTPUT_DIR="npm-dist"
+NPM_DIR="npm-dist"
 MODULE_NAME=ginger-js
-OUTPUT_FILE="$OUTPUT_DIR/$MODULE_NAME"
+NPM_OUTPUT_FILE="$NPM_DIR/$MODULE_NAME.js"
+BOWER_DIR="purescript-ginger"
+BOWER_OUTPUT_FILE="$BOWER_DIR/src/$MODULE_NAME.js"
 
-mkdir -p "$OUTPUT_DIR"
+mkdir -p "$NPM_DIR"
 
 (
     # Some serious callback voodoo is needed to play nice with nodejs.
@@ -61,4 +63,6 @@ EOT
     echo '/////////// BEGIN GHCJS GENERATED CODE ///////////'
     cat "$JS_DIR/all.js"
     echo '/////////// END GHCJS GENERATED CODE ///////////'
-) > "$OUTPUT_FILE.js"
+) > "$NPM_OUTPUT_FILE"
+
+cp "$NPM_OUTPUT_FILE" "$BOWER_OUTPUT_FILE"

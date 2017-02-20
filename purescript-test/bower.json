@@ -1,5 +1,5 @@
 {
-  "name": "purescript-ginger",
+  "name": "purescript-test",
   "ignore": [
     "**/.*",
     "node_modules",
@@ -9,13 +9,9 @@
   "dependencies": {
     "purescript-prelude": "^2.4.0",
     "purescript-console": "^2.0.0",
-    "purescript-aff": "^2.0.3",
-    "purescript-argonaut-core": "^2.0.1",
-    "purescript-ffi-utils": "^1.2.0",
-    "purescript-argonaut": "^2.0.0"
+    "purescript-ginger": "../purescript-ginger"
   },
   "devDependencies": {
     "purescript-psci-support": "^2.0.0"
-  },
-  "version": "0.0.0"
+  }
 }

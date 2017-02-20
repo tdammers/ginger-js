@@ -10,7 +10,7 @@ foreign import data GINGER :: !
 foreign import data GingerM :: *
 
 gingerM :: GingerM
-gingerM = require("../../ginger-js")
+gingerM = require("../../bower_components/purescript-ginger/src/ginger-js")
 
 ginger :: forall e
         . String
