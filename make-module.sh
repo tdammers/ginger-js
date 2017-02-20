@@ -7,6 +7,7 @@ MODULE_NAME=ginger-js
 NPM_OUTPUT_FILE="$NPM_DIR/$MODULE_NAME.js"
 BOWER_DIR="purescript-ginger"
 BOWER_OUTPUT_FILE="$BOWER_DIR/src/$MODULE_NAME.js"
+BOWER_ZIPFILE="purescript-ginger.zip"
 
 mkdir -p "$NPM_DIR"
 
@@ -66,3 +67,7 @@ EOT
 ) > "$NPM_OUTPUT_FILE"
 
 cp "$NPM_OUTPUT_FILE" "$BOWER_OUTPUT_FILE"
+
+cd "$BOWER_DIR"
+zip "../$BOWER_ZIPFILE" bower.json src test
+cd ..
