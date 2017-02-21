@@ -69,5 +69,6 @@ EOT
 cp "$NPM_OUTPUT_FILE" "$BOWER_OUTPUT_FILE"
 
 cd "$BOWER_DIR"
-zip "../$BOWER_ZIPFILE" bower.json src test
+rm "../$BOWER_ZIPFILE"
+zip "../$BOWER_ZIPFILE" bower.json src src/*.{js,purs} test test/*.purs
 cd ..
