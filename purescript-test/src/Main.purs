@@ -19,9 +19,11 @@ main = do
                     )
               ~> jsonEmptyObject
   canceler <- runAff
-    (const $ pure unit)
-    (const $ pure unit) $ do
+    (log <<< show)
+    (log <<< show) $ do
       result <- ginger template (encodeJson context)
       liftEff' $ log result
-      liftEff' $ log "How about that."
+      result <- ginger "This is invalid syntax: {{" jsonEmptyObject
+      liftEff' $ log result
+      liftEff' $ log "All Done."
   pure unit

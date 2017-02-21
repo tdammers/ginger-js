@@ -132,13 +132,13 @@ jsvalFromGValListItems items =
 
 ginger :: JSVal -> JSVal -> IO JSVal
 ginger templateJS contextJS = do
-    templateStr <- maybe (warn "Template must be string") return =<<
+    templateStr <- maybe (throwJS "Template must be string") return =<<
         fromJSVal templateJS
-    template <- either (warn . show) return =<<
+    template <- either (throwJS . formatParserError (Just templateStr)) return =<<
         parseGinger
             (const $ return Nothing) -- include resolver
             Nothing -- source name
-            (Text.unpack templateStr) -- template source
+            templateStr -- template source
     let context = fromMaybe [] $ jsvalToDictItems contextJS
     buf <- newIORef ""
     easyRenderM
@@ -161,6 +161,14 @@ warn :: String -> IO a
 warn str = do
     consoleLog $ pack str
     fail str
+
+foreign import javascript unsafe "throwError"
+    js_throw :: JSString -> IO ()
+
+throwJS :: String -> IO a
+throwJS msg = do
+    js_throw $ pack msg
+    return undefined
 
 main :: IO ()
 main = do

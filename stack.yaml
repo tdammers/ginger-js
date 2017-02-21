@@ -33,11 +33,15 @@ packages:
     git: https://github.com/ghcjs/ghcjs-ffiqq
     commit: 'b52338c2dcd3b0707bc8aff2e171411614d4aedb'
   extra-dep: true
+- location:
+    git: https://github.com/tdammers/ginger
+    commit: '0.5.1.0'
+  extra-dep: true
 
 # Dependency packages to be pulled from upstream that are not in the resolver
 # (e.g., acme-missiles-0.3)
 extra-deps:
-- 'ginger-0.5.0.0'
+- 'ginger-0.5.1.0'
 
 # Override default flag values for local packages and extra-deps
 flags: {}

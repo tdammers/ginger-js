@@ -72,3 +72,7 @@ function fromListItems(items) {
     if (!Array.isArray(items)) return []
     return items
 }
+
+function throwError(msg) {
+    throw msg;
+}
