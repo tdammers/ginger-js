@@ -8,7 +8,7 @@ import Ginger
 import Data.Argonaut
 import Data.StrMap as StrMap
 
-main :: forall e. Eff (interpretGinger :: GINGER, console :: CONSOLE | e) Unit
+main :: forall e. Eff (console :: CONSOLE | e) Unit
 main = do
   let template = "Hello, {{ name }}!\n{% for name, msg in items %}{{ name }} says: '{{ msg }}'\n{% endfor %}"
       context =  "name" := "sailor"
